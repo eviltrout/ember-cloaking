@@ -3,8 +3,8 @@
   /**
     Display a list of cloaked items
 
-    @class CloakedContainerView
-    @extends Ember.View
+    @class CloakedCollectionView
+    @extends Ember.CollectionView
     @namespace Ember
   **/
   Ember.CloakedCollectionView = Ember.CollectionView.extend({
