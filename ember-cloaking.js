@@ -13,7 +13,7 @@
 
     init: function() {
       var cloakView = this.get('cloakView'),
-          idProperty = this.get('idProperty');
+          idProperty = this.get('idProperty') || 'id';
 
       // Set the slack ratio differently to allow for more or less slack in preloading
       var slackRatio = parseFloat(this.get('slackRatio'));
@@ -22,12 +22,11 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
+        defaultHeight: this.get('defaultHeight') || 100,
 
         init: function() {
           this._super();
-          if (idProperty) {
-            this.set('elementId', cloakView + '-cloak-' + this.get('content.' + idProperty));
-          }
+          this.set('elementId', cloakView + '-cloak-' + this.get('content.' + idProperty));
         }
       }));
 
@@ -137,9 +136,7 @@
         this.setProperties({topVisible: null, bottomVisible: null});
       }
 
-      var toCloak = childViews.slice(0, topView).concat(childViews.slice(bottomView+1)),
-          loadingView = childViews[bottomView + 1];
-
+      var toCloak = childViews.slice(0, topView).concat(childViews.slice(bottomView+1));
       Em.run.schedule('afterRender', function() {
         toUncloak.forEach(function (v) { v.uncloak(); });
         toCloak.forEach(function (v) { v.cloak(); });
@@ -175,7 +172,6 @@
       $(document).unbind('touchmove.ember-cloak');
       $(window).unbind('scroll.ember-cloak');
     }
-
   });
 
 
