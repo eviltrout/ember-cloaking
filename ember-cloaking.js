@@ -146,7 +146,7 @@
         var checkView = childViews[j];
         if (!checkView.get('containedView')) {
           if (!checkView.get('loading')) {
-            checkView.$().html("<div class='spinner'>" + I18n.t('loading') + "</div>");
+            checkView.$().html(this.get('loadingHTML') || "Loading...");
           }
           return;
         }

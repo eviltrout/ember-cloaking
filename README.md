@@ -23,6 +23,8 @@ your average view height. Note: Your views don't have to be the same height.
 
 `content` is the collection of items to display.
 
+`loadingHTML` is the HTML you want to render while the cloaking is loading. If omitted it will default to "Loading..."
+
 License
 =======
 MIT
