@@ -172,8 +172,8 @@
     },
 
     willDestroyElement: function() {
-      $(document).bind('touchmove.ember-cloak');
-      $(window).bind('scroll.ember-cloak');
+      $(document).unbind('touchmove.ember-cloak');
+      $(window).unbind('scroll.ember-cloak');
     }
 
   });
