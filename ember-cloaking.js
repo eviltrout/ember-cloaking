@@ -202,7 +202,7 @@
         this.setProperties({
           style: null,
           loading: false,
-          containedView: this.createChildView(this.get('cloaks'), {content: this.get('content') })
+          containedView: this.createChildView(this.get('cloaks'), {context: this.get('content') })
         });
 
         this.rerender();
