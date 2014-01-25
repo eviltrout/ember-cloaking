@@ -25,6 +25,19 @@ your average view height. Note: Your views don't have to be the same height.
 
 `loadingHTML` is the HTML you want to render while the cloaking is loading. If omitted it will default to "Loading..."
 
+iScroll or other scrollers
+--------------------------
+[Demo](/demos/iscroll.html)
+
+```handlebars
+  {{cloaked-collection cloakView="item" content=model wrapperTopBinding="view.scrollTop" wrapperHeightBinding="view.height"}}
+```
+
+`wrapperTop` is the current scroll position like native [element.scrollTop](https://developer.mozilla.org/en-US/docs/Web/API/Element.scrollTop)
+
+`wrapperHeight` is the height of the "window" in which content scrolling
+
+
 License
 =======
 MIT

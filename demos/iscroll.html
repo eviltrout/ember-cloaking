@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/coffee-script/1.6.3/coffee-script.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script src="http://rawgithub.com/cubiq/iscroll/master/build/iscroll-probe.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.js"></script>
+  <script src="http://builds.emberjs.com/ember-latest.js"></script>
+  <script src="../ember-cloaking.js"></script>
+  <style>
+      .ember-view {
+      -webkit-animation: debug .3s;
+    }
+
+    @-webkit-keyframes debug {
+      0% { 
+        background-color: yellow;
+      }
+      100% {
+        background-color: inherit;
+      }
+    }
+
+    .scroll-wrap {
+      position: relative;
+      overflow: hidden;
+      border: 1px dotted black;
+    }
+
+    .lol {
+      width: 100%;
+      background: black;
+      opacity: .2;
+      position: absolute;
+    }
+  </style>
+  <script type="text/coffeescript">
+    App = Ember.Application.create()
+    App.Router.map ->
+      @resource 'scroll'
+
+    # random nums for view height
+    random_height = ->
+      Math.round( Math.random()*100 + 20 )
+    # create a lots of crap 
+    model =  ( { id: i, height: random_height() } for i in [0..500] )
+    App.ScrollRoute = Ember.Route.extend
+      model: ->
+        model 
+
+    App.ScrollView = Em.View.extend
+      templateName: 'scroll'
+      classNames: ['scroll-wrap']
+      scrollTop:0
+      height: 500
+      
+      didInsertElement: ->
+        @$().css 'height', @get('height')
+        iscroll = new IScroll @get('element'),
+                            probeType: 2
+                            mouseWheel: true
+                            preventDefault: false
+                            scrollbars: true
+                            interactiveScrollbars: true
+                            deceleration: 0.0012
+        @set 'iscroll', iscroll 
+        iscroll.on 'scroll', => @set 'scrollTop', -iscroll.y
+        iscroll.on 'scrollEnd', => @set 'scrollTop', -iscroll.y
+        interval_id = setInterval ->
+            iscroll.refresh()
+          , 300
+        @set 'interval_id', interval_id
+
+      willDestroyElement: ->
+        @get('iscroll').destroy()
+        clearInterval(@get('interval_id'))
+
+    App.ItemView = Em.View.extend
+      templateName: 'item'
+      contextBinding: 'content'
+      
+      didInsertElement: ->
+        @$().css 'height', @get('context.height') 
+
+  </script>
+  <title>JS Bin</title>
+</head>
+<body>
+  <script type="text/x-handlebars">
+    {{#link-to "scroll"}}go to scroll{{/link-to}}
+    {{outlet}}
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="scroll">
+    {{cloaked-collection cloakView="item" content=model wrapperTopBinding="view.scrollTop" wrapperHeightBinding="view.height"}}
+  </script>
+    <script type="text/x-handlebars" data-template-name="item">
+    #{{id}} ({{height}}px)
+  </script>
+</body>
+</html>
