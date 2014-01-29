@@ -34,6 +34,7 @@
       Ember.run.next(this, 'scrolled');
     },
 
+
     /**
       If the topmost visible view changed, we will notify the controller if it has an appropriate hook.
 
@@ -70,8 +71,10 @@
       if (max < min) { return min; }
 
       var mid = Math.floor((min + max) / 2),
+          // in case of not full-window scrolling
+          scrollOffset = this.get('wrapperTop') >> 0,
           $view = childViews[mid].$(),
-          viewBottom = $view.offset().top + $view.height();
+          viewBottom = $view.position().top + scrollOffset + $view.height();
 
       if (viewBottom > viewportTop) {
         return this.findTopView(childViews, viewportTop, min, mid-1);
@@ -90,17 +93,18 @@
       if ((!childViews) || (childViews.length === 0)) { return; }
 
       var toUncloak = [],
-          $w = $(window),
-          windowHeight = window.innerHeight ? window.innerHeight : $w.height(),
-          windowTop = $w.scrollTop(),
+          onscreen = [];
+      // calculating viewport edges
+          $w = $(window)
+          windowHeight = this.get('wrapperHeight') || ( window.innerHeight ? window.innerHeight : $w.height() ),
+          windowTop = this.get('wrapperTop') || $w.scrollTop(),
           slack = Math.round(windowHeight * this.get('slackRatio')),
           viewportTop = windowTop - slack,
           windowBottom = windowTop + windowHeight,
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
-          bodyHeight = $('body').height(),
-          bottomView = topView,
-          onscreen = [];
+          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
+          bottomView = topView;
 
       if (windowBottom > bodyHeight) { windowBottom = bodyHeight; }
       if (viewportBottom > bodyHeight) { viewportBottom = bodyHeight; }
@@ -109,7 +113,9 @@
       while (bottomView < childViews.length) {
         var view = childViews[bottomView],
           $view = view.$(),
-          viewTop = $view.offset().top,
+          // in case of not full-window scrolling
+          scrollOffset = this.get('wrapperTop') >> 0,
+          viewTop = $view.position().top + scrollOffset,
           viewBottom = viewTop + $view.height();
 
         if (viewTop > viewportBottom) { break; }
@@ -166,6 +172,7 @@
 
       $(document).bind('touchmove.ember-cloak', onScrollMethod);
       $(window).bind('scroll.ember-cloak', onScrollMethod);
+      this.addObserver('wrapperTop', self, onScrollMethod);
     },
 
     willDestroyElement: function() {
