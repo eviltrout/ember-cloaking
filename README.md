@@ -18,6 +18,8 @@ Usage
 
 `cloakView` is the name of the view to render in the collection. `post` would render `PostView`.
 
+`itemController` is the name of the controller for items in collection; if not set will be resolved using `cloakView` name
+
 `defaultHeight` is the height of the cloaked views by default. You should pick a value that is in the ballpark of
 your average view height. Note: Your views don't have to be the same height.
 
