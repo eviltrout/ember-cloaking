@@ -287,7 +287,7 @@
         if(!this.$().height()){
           var defaultHeight = 100;
           if (this.get('content.defaultCloakHeight')) {
-            defaultHeight = this.get('content.defaultCloakHeight');
+            defaultHeight = this.get('content.`');
           } else if(this.get('defaultHeight')) {
             defaultHeight = this.get('defaultHeight');
           }
@@ -309,7 +309,10 @@
         containedView.transitionTo('inDOM');
         Em.run.schedule('afterRender', function() {
           containedView.didInsertElement();
+          this.trigger('didUncloak');
         });
+      } else {
+        this.trigger('didCloak');
       }
     }
 
