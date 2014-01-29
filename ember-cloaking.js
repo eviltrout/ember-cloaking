@@ -173,6 +173,7 @@
       $(document).bind('touchmove.ember-cloak', onScrollMethod);
       $(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
+      this.addObserver('wrapperHeight', self, onScrollMethod);
     },
 
     willDestroyElement: function() {
