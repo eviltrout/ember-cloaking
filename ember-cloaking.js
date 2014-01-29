@@ -303,13 +303,14 @@
       @method render
     */
     render: function(buffer) {
-      var containedView = this.get('containedView');
+      var containedView = this.get('containedView'),
+          self = this;
       if (containedView && containedView.get('state') !== 'inDOM') {
         containedView.renderToBuffer(buffer);
         containedView.transitionTo('inDOM');
         Em.run.schedule('afterRender', function() {
           containedView.didInsertElement();
-          this.trigger('didUncloak');
+          self.trigger('didUncloak');
         });
       } else {
         this.trigger('didCloak');
