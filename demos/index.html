@@ -38,9 +38,13 @@
     App.ScrollView = Em.View.extend
       templateName: 'scroll'
 
+    App.ItemController = Em.ObjectController.extend
+      actions:
+        greeting: ->
+          alert('Hi! This is a message from ItemController.')
+
     App.ItemView = Em.View.extend
       templateName: 'item'
-      contextBinding: 'content'
       
       didInsertElement: ->
         @$().css 'height', @get('context.height') 
@@ -55,10 +59,12 @@
   </script>
   
   <script type="text/x-handlebars" data-template-name="scroll">
-  {{cloaked-collection cloakView="item" content=model}}
+    {{cloaked-collection cloakView="item" content=model}}
   </script>
     <script type="text/x-handlebars" data-template-name="item">
-    #{{id}} ({{height}}px)
+      <div {{action greeting}}>
+        #{{id}} ({{height}}px)
+      </div>
   </script>
 </body>
 </html>

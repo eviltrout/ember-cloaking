@@ -22,6 +22,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
+        cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight') || 100,
 
         init: function() {
@@ -206,11 +207,37 @@
     uncloak: function() {
       var containedView = this.get('containedView');
       if (!containedView) {
+        var model = this.get('content'),
+            controller = null,
+            container = this.get('container');
+
+        // lookup for controller
+        // use custom controller or lookup by view name
+        var controllerName = this.get('cloaksController') || this.get('cloaks'),
+            controllerFullName = 'controller:' + controllerName,
+            factory = container.lookupFactory(controllerFullName),
+            parentController = this.get('controller');
+
+        // failed lookup
+        if(factory === undefined) {
+          Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+          factory = Ember.generateControllerFactory(container, controllerName, model);
+          Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+        }
+
+        controller = factory.create({
+          model: model,
+          parentController: parentController,
+          target: parentController
+        });
+
 
         this.setProperties({
           style: null,
           loading: false,
-          containedView: this.createChildView(this.get('cloaks'), {context: this.get('content') })
+          containedView: this.createChildView(this.get('cloaks'), {
+              context: controller || model, 
+              controller: controller})
         });
 
         this.rerender();
