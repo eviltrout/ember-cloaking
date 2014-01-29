@@ -23,7 +23,7 @@
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
         cloaksController: this.get('itemController'),
-        defaultHeight: this.get('defaultHeight') || 100,
+        defaultHeight: this.get('defaultHeight'),
 
         init: function() {
           this._super();
@@ -104,7 +104,7 @@
           windowBottom = windowTop + windowHeight,
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
-          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
+          bodyHeight = this.get('wrapperHeight') ? this.get('wrapperHeight') : $('body').height(),
           bottomView = topView;
 
       if (windowBottom > bodyHeight) { windowBottom = bodyHeight; }
@@ -175,6 +175,7 @@
       $(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
+      this.scrollTriggered();
     },
 
     willDestroyElement: function() {
@@ -196,7 +197,7 @@
 
     init: function() {
       this._super();
-      this.uncloak();
+      this.cloak();
     },
 
     /**
@@ -232,12 +233,23 @@
         });
 
 
+        view = this.createChildView(
+                this.get('cloaks'), 
+                {
+                  context: controller || model, 
+                  controller: controller
+                }
+        );
+
         this.setProperties({
           style: null,
           loading: false,
-          containedView: this.createChildView(this.get('cloaks'), {
-              context: controller || model, 
-              controller: controller})
+          containedView: view
+        });
+
+        // reset default height
+        view.one('didInsertElement', this, function(){
+          cloak_view.$().css('height', '');
         });
 
         this.rerender();
@@ -268,6 +280,22 @@
       }
     },
 
+    didInsertElement: function(){
+      if (!this.get('containedView')) {
+        // setting default height
+        // but do not touch if height already defined
+        if(!this.$().height()){
+          var defaultHeight = 100;
+          if (this.get('content.defaultCloakHeight')) {
+            defaultHeight = this.get('content.defaultCloakHeight');
+          } else if(this.get('defaultHeight')) {
+            defaultHeight = this.get('defaultHeight');
+          }
+
+          this.$().css('height', defaultHeight);
+        }
+      }
+    },
 
     /**
       Render the cloaked view if applicable.

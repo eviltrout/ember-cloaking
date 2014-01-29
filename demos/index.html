@@ -30,7 +30,7 @@
     random_height = ->
       Math.round( Math.random()*100 + 20 )
     # create a lots of crap 
-    model =  ( { id: i, height: random_height() } for i in [0..500] )
+    model =  ( { id: i, height: random_height() } for i in [0..200] )
     App.ScrollRoute = Ember.Route.extend
       model: ->
         model 
@@ -47,6 +47,7 @@
       templateName: 'item'
       
       didInsertElement: ->
+        console.log('inserted #' + @get('context.id') );
         @$().css 'height', @get('context.height') 
 
   </script>
