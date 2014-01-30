@@ -291,7 +291,7 @@
         if(!this.$().height()){
           var defaultHeight = 100;
           if (this.get('content.defaultCloakHeight')) {
-            defaultHeight = this.get('content.`');
+            defaultHeight = this.get('content.defaultCloakHeight');
           } else if(this.get('defaultHeight')) {
             defaultHeight = this.get('defaultHeight');
           }
