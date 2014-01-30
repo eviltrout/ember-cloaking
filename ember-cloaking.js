@@ -165,6 +165,10 @@
       Em.run.scheduleOnce('afterRender', this, 'scrolled');
     },
 
+    content_changed: function(){
+      this.scrollTriggered();
+    }.observes('content'),
+
     didInsertElement: function() {
       var self = this,
           onScrollMethod = function() {
