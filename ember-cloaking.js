@@ -218,11 +218,15 @@
             factory = container.lookupFactory(controllerFullName),
             parentController = this.get('controller');
 
-        // failed lookup
-        if(factory === undefined) {
-          Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+        // let ember generate controller if needed
+        if (factory === undefined) {
           factory = Ember.generateControllerFactory(container, controllerName, model);
-          Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+
+          // inform developer about typo
+          if (this.get('cloaksController')) {
+            Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+            Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+          }
         }
 
         controller = factory.create({
