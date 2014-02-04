@@ -22,6 +22,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
+        cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight') || 100,
 
         init: function() {
@@ -93,9 +94,9 @@
       if ((!childViews) || (childViews.length === 0)) { return; }
 
       var toUncloak = [],
-          onscreen = [];
-      // calculating viewport edges
-          $w = $(window)
+          onscreen = [],
+          // calculating viewport edges
+          $w = $(window),
           windowHeight = this.get('wrapperHeight') || ( window.innerHeight ? window.innerHeight : $w.height() ),
           windowTop = this.get('wrapperTop') || $w.scrollTop(),
           slack = Math.round(windowHeight * this.get('slackRatio')),
@@ -206,11 +207,41 @@
     uncloak: function() {
       var containedView = this.get('containedView');
       if (!containedView) {
+        var model = this.get('content'),
+            controller = null,
+            container = this.get('container');
+
+        // lookup for controller
+        // use custom controller or lookup by view name
+        var controllerName = this.get('cloaksController') || this.get('cloaks'),
+            controllerFullName = 'controller:' + controllerName,
+            factory = container.lookupFactory(controllerFullName),
+            parentController = this.get('controller');
+
+        // let ember generate controller if needed
+        if (factory === undefined) {
+          factory = Ember.generateControllerFactory(container, controllerName, model);
+
+          // inform developer about typo
+          if (this.get('cloaksController')) {
+            Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+            Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+          }
+        }
+
+        controller = factory.create({
+          model: model,
+          parentController: parentController,
+          target: parentController
+        });
+
 
         this.setProperties({
           style: null,
           loading: false,
-          containedView: this.createChildView(this.get('cloaks'), {context: this.get('content') })
+          containedView: this.createChildView(this.get('cloaks'), {
+            context: controller || model,
+            controller: controlleri })
         });
 
         this.rerender();
