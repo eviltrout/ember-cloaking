@@ -223,11 +223,15 @@
             factory = container.lookupFactory(controllerFullName),
             parentController = this.get('controller');
 
-        // failed lookup
-        if(factory === undefined) {
-          Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+        // let ember generate controller if needed
+        if (factory === undefined) {
           factory = Ember.generateControllerFactory(container, controllerName, model);
-          Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+
+          // inform developer about typo
+          if (this.get('cloaksController')) {
+            Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
+            Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+          }
         }
 
         controller = factory.create({
@@ -237,23 +241,12 @@
         });
 
 
-        view = this.createChildView(
-                this.get('cloaks'), 
-                {
-                  context: controller || model, 
-                  controller: controller
-                }
-        );
-
         this.setProperties({
           style: null,
           loading: false,
-          containedView: view
-        });
-
-        // reset default height
-        view.one('didInsertElement', this, function(){
-          cloak_view.$().css('height', '');
+          containedView: this.createChildView(this.get('cloaks'), {
+            context: controller || model,
+            controller: controlleri })
         });
 
         this.rerender();
