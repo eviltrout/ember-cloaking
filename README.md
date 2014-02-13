@@ -29,8 +29,11 @@ your average view height. Note: Your views don't have to be the same height.
 
 `preservesContext` can be set to "true" if you want to use `content.xyz` in your views instead of the `context`.
 
+`offsetFixed` is a jQuery selector that will be used to offset what is considered onscreen. Discourse uses this for example because we have a `position: fixed` header that is on top of content.
+
 iScroll or other scrollers
---------------------------
+==========================
+
 [Demo](/demos/iscroll.html)
 
 ```handlebars
@@ -40,6 +43,14 @@ iScroll or other scrollers
 `wrapperTop` is the current scroll position like native [element.scrollTop](https://developer.mozilla.org/en-US/docs/Web/API/Element.scrollTop)
 
 `wrapperHeight` is the height of the "window" in which content scrolling
+
+Callbacks
+=========
+
+You can add the following methods to the controller that contains the `{{cloaked-collection}}` to be notified when elements are onscreen:
+
+`bottomVisibleChanged`: Called when the bottomost visible element changes
+`topVisibleChanged`: Called when the topmost visible element changes
 
 
 License

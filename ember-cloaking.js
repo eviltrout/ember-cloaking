@@ -10,6 +10,7 @@
   Ember.CloakedCollectionView = Ember.CollectionView.extend({
     topVisible: null,
     bottomVisible: null,
+    offsetFixedElement: null,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -109,11 +110,15 @@
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
           bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
-          bottomView = topView;
+          bottomView = topView,
+          offsetFixedElement = this.get('offsetFixedElement');
 
       if (windowBottom > bodyHeight) { windowBottom = bodyHeight; }
       if (viewportBottom > bodyHeight) { viewportBottom = bodyHeight; }
 
+      if (offsetFixedElement) {
+        windowTop += (offsetFixedElement.outerHeight(true) || 0);
+      }
       // Find the bottom view and what's onscreen
       while (bottomView < childViews.length) {
         var view = childViews[bottomView],
@@ -169,22 +174,27 @@
       Em.run.scheduleOnce('afterRender', this, 'scrolled');
     },
 
-    didInsertElement: function() {
+    _startEvents: function() {
       var self = this,
+          offsetFixed = this.get('offsetFixed'),
           onScrollMethod = function() {
             Ember.run.debounce(self, 'scrollTriggered', 10);
           };
+
+      if (offsetFixed) {
+        this.set('offsetFixedElement', $(offsetFixed));
+      }
 
       $(document).bind('touchmove.ember-cloak', onScrollMethod);
       $(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
-    },
+    }.on('didInsertElement'),
 
-    willDestroyElement: function() {
+    _endEvents: function() {
       $(document).unbind('touchmove.ember-cloak');
       $(window).unbind('scroll.ember-cloak');
-    }
+    }.on('willDestroyElement')
   });
 
 
