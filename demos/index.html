@@ -29,11 +29,12 @@
     # random nums for view height
     random_height = ->
       Math.round( Math.random()*100 + 20 )
-    # create a lots of crap 
+
+    # create a lots of crap
     model =  ( { id: i, height: random_height() } for i in [0..500] )
     App.ScrollRoute = Ember.Route.extend
       model: ->
-        model 
+        model
 
     App.ScrollView = Em.View.extend
       templateName: 'scroll'
@@ -45,12 +46,12 @@
 
     App.ItemView = Em.View.extend
       templateName: 'item'
-      
+
       didInsertElement: ->
-        @$().css 'height', @get('context.height') 
+        @$().css 'height', @get('context.height')
 
   </script>
-  <title>JS Bin</title>
+  <title>Ember Cloaking Test</title>
 </head>
 <body>
   <script type="text/x-handlebars">
