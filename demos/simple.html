@@ -12,7 +12,7 @@
     }
 
     @-webkit-keyframes debug {
-      0% { 
+      0% {
         background-color: yellow;
       }
       100% {
@@ -33,16 +33,12 @@
     # create a lots of crap
     model =  ( { id: i, height: random_height() } for i in [0..500] )
     App.ScrollRoute = Ember.Route.extend
-      model: ->
-        model
+      model: -> model
+      actions:
+        greeting: -> alert('greeting from route')
 
     App.ScrollView = Em.View.extend
       templateName: 'scroll'
-
-    App.ItemController = Em.ObjectController.extend
-      actions:
-        greeting: ->
-          alert('Hi! This is a message from ItemController.')
 
     App.ItemView = Em.View.extend
       templateName: 'item'
@@ -60,7 +56,7 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="scroll">
-    {{cloaked-collection cloakView="item" itemController="item" content=model}}
+    {{cloaked-collection cloakView="item" content=model}}
   </script>
     <script type="text/x-handlebars" data-template-name="item">
       <div {{action greeting}}>

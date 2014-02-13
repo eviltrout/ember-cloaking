@@ -214,37 +214,35 @@
             controller = null,
             container = this.get('container');
 
-        // lookup for controller
-        // use custom controller or lookup by view name
-        var controllerName = this.get('cloaksController') || this.get('cloaks'),
-            controllerFullName = 'controller:' + controllerName,
-            factory = container.lookupFactory(controllerFullName),
-            parentController = this.get('controller');
+        // Wire up the itemController if necessary
+        var controllerName = this.get('cloaksController');
+        if (controllerName) {
+          var controllerFullName = 'controller:' + controllerName,
+              factory = container.lookupFactory(controllerFullName),
+              parentController = this.get('controller');
 
-        // let ember generate controller if needed
-        if (factory === undefined) {
-          factory = Ember.generateControllerFactory(container, controllerName, model);
+          // let ember generate controller if needed
+          if (factory === undefined) {
+            factory = Ember.generateControllerFactory(container, controllerName, model);
 
-          // inform developer about typo
-          if (this.get('cloaksController')) {
+            // inform developer about typo
             Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
             Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
           }
+
+          controller = factory.create({
+            model: model,
+            parentController: parentController,
+            target: parentController
+          });
         }
 
-        controller = factory.create({
-          model: model,
-          parentController: parentController,
-          target: parentController
-        });
-
-
+        var createArgs = { context: controller || model };
+        if (controller) { createArgs.controller = controller; }
         this.setProperties({
           style: null,
           loading: false,
-          containedView: this.createChildView(this.get('cloaks'), {
-            context: controller || model,
-            controller: controller })
+          containedView: this.createChildView(this.get('cloaks'), createArgs)
         });
 
         this.rerender();
