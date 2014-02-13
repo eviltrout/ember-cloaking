@@ -13,7 +13,7 @@
 
     init: function() {
       var cloakView = this.get('cloakView'),
-          idProperty = this.get('idProperty') || 'id';
+          idProperty = this.get('idProperty');
 
       // Set the slack ratio differently to allow for more or less slack in preloading
       var slackRatio = parseFloat(this.get('slackRatio'));
@@ -27,7 +27,10 @@
 
         init: function() {
           this._super();
-          this.set('elementId', cloakView + '-cloak-' + this.get('content.' + idProperty));
+
+          if (idProperty) {
+            this.set('elementId', cloakView + '-cloak-' + this.get('content.' + idProperty));
+          }
         }
       }));
 
