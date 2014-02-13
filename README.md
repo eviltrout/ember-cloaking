@@ -18,7 +18,7 @@ Usage
 
 `cloakView` is the name of the view to render in the collection. `post` would render `PostView`.
 
-`itemController` is the name of the controller for items in collection; if not set will be resolved using `cloakView` name
+`itemController` is the name of the controller for items in collection. If not set, no itemController will be used.
 
 `defaultHeight` is the height of the cloaked views by default. You should pick a value that is in the ballpark of
 your average view height. Note: Your views don't have to be the same height.
@@ -26,6 +26,8 @@ your average view height. Note: Your views don't have to be the same height.
 `content` is the collection of items to display.
 
 `loadingHTML` is the HTML you want to render while the cloaking is loading. If omitted it will default to "Loading..."
+
+`preservesContext` can be set to "true" if you want to use `content.xyz` in your views instead of the `context`.
 
 iScroll or other scrollers
 --------------------------

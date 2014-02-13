@@ -22,6 +22,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
+        preservesContext: this.get('preservesContext') === "true",
         cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight') || 100,
 
@@ -237,7 +238,14 @@
           });
         }
 
-        var createArgs = { context: controller || model };
+        var createArgs = {},
+            target = controller || model;
+
+        if (this.get('preservesContext')) {
+          createArgs.content = target;
+        } else {
+          createArgs.context = target;
+        }
         if (controller) { createArgs.controller = controller; }
         this.setProperties({
           style: null,
