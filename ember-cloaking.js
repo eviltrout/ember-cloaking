@@ -246,7 +246,7 @@
           loading: false,
           containedView: this.createChildView(this.get('cloaks'), {
             context: controller || model,
-            controller: controlleri })
+            controller: controller })
         });
 
         this.rerender();
