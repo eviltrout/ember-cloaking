@@ -13,7 +13,7 @@
     }
 
     @-webkit-keyframes debug {
-      0% { 
+      0% {
         background-color: yellow;
       }
       100% {
@@ -53,17 +53,17 @@
       classNames: ['scroll-wrap']
       scrollTop:0
       height: 500
-      
+
       didInsertElement: ->
         @$().css 'height', @get('height')
         iscroll = new IScroll @get('element'),
-                            probeType: 2
+                            probeType: 3
                             mouseWheel: true
                             preventDefault: false
                             scrollbars: true
                             interactiveScrollbars: true
                             deceleration: 0.0012
-        @set 'iscroll', iscroll 
+        @set 'iscroll', iscroll
         iscroll.on 'scroll', => @set 'scrollTop', -iscroll.y
         iscroll.on 'scrollEnd', => @set 'scrollTop', -iscroll.y
         interval_id = setInterval ->
@@ -77,12 +77,12 @@
 
     App.ItemView = Em.View.extend
       templateName: 'item'
-      
+
       didInsertElement: ->
-        @$().css 'height', @get('context.height') 
+        @$().css 'height', @get('context.height')
 
   </script>
-  <title>JS Bin</title>
+  <title>Ember Cloaking Test (iScroll)</title>
 </head>
 <body>
   <script type="text/x-handlebars">
