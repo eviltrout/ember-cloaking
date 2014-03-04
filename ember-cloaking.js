@@ -246,8 +246,8 @@
             factory = Ember.generateControllerFactory(container, controllerName, model);
 
             // inform developer about typo
-            Ember.Logger.warn('ember-cloacking: can\'t lookup controller by name "' + controllerFullName + '".');
-            Ember.Logger.warn('ember-cloacking: using ' + factory.toString() + '.');
+            Ember.Logger.warn('ember-cloaking: can\'t lookup controller by name "' + controllerFullName + '".');
+            Ember.Logger.warn('ember-cloaking: using ' + factory.toString() + '.');
           }
 
           controller = factory.create({
