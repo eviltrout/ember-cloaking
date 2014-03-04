@@ -25,7 +25,7 @@
         cloaks: cloakView,
         preservesContext: this.get('preservesContext') === "true",
         cloaksController: this.get('itemController'),
-        defaultHeight: this.get('defaultHeight') || 100,
+        defaultHeight: this.get('defaultHeight'),
 
         init: function() {
           this._super();
@@ -111,7 +111,7 @@
           windowBottom = windowTop + windowHeight,
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
-          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
+          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height()
           bottomView = topView,
           offsetFixedElement = this.get('offsetFixedElement');
 
@@ -175,6 +175,9 @@
     scrollTriggered: function() {
       Em.run.scheduleOnce('afterRender', this, 'scrolled');
     },
+    contentChanged: function(){
+      this.scrollTriggered();
+    }.observes('content'),
 
     _startEvents: function() {
       var self = this,
@@ -191,6 +194,7 @@
       $(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
+      this.scrollTriggered();
 
       this.set('scrollingEnabled', true);
     }.on('didInsertElement'),
@@ -219,7 +223,7 @@
 
     init: function() {
       this._super();
-      this.uncloak();
+      this.cloak();
     },
 
     /**
@@ -300,6 +304,22 @@
       }
     },
 
+    didInsertElement: function(){
+      if (!this.get('containedView')) {
+        // setting default height
+        // but do not touch if height already defined
+        if(!this.$().height()){
+          var defaultHeight = 100;
+          if (this.get('content.defaultCloakHeight')) {
+            defaultHeight = this.get('content.defaultCloakHeight');
+          } else if(this.get('defaultHeight')) {
+            defaultHeight = this.get('defaultHeight');
+          }
+
+          this.$().css('height', defaultHeight);
+        }
+      }
+    },
 
     /**
       Render the cloaked view if applicable.
@@ -307,13 +327,17 @@
       @method render
     */
     render: function(buffer) {
-      var containedView = this.get('containedView');
+      var containedView = this.get('containedView'),
+          self = this;
       if (containedView && containedView.get('state') !== 'inDOM') {
         containedView.renderToBuffer(buffer);
         containedView.transitionTo('inDOM');
         Em.run.schedule('afterRender', function() {
           containedView.didInsertElement();
+          self.trigger('didUncloak');
         });
+      } else {
+        this.trigger('didCloak');
       }
     }
 
