@@ -71,6 +71,12 @@ Default: `undefined`
 Height of the "window" in which content is scrolling (see [iScroll support](#iscroll-or-other-scrollers)).
 
 
+###uncloakDefault
+Default: `false`
+
+Whether or not to uncloak views by default when created. This is useful for sites like Discourse
+that perform infinite scrolling upwards, and depend on inserting elements above the top fold.
+
 iScroll or other scrollers
 --------------------------
 
