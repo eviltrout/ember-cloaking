@@ -327,10 +327,11 @@
     render: function(buffer) {
       var containedView = this.get('containedView');
       if (containedView && containedView.get('state') !== 'inDOM') {
+        containedView.triggerRecursively('willInsertElement');
         containedView.renderToBuffer(buffer);
         containedView.transitionTo('inDOM');
         Em.run.schedule('afterRender', function() {
-          containedView.didInsertElement();
+          containedView.triggerRecursively('didInsertElement');
         });
       }
     }
