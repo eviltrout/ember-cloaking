@@ -53,10 +53,15 @@ Default: `undefined`
 Name of item's property to generate cloaked view DOM id. If set `id` will be generated using `cloakView` like so: `{{cloakView}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
 
 
-####offsetFixed
+####offsetFixedTop
 Default: `undefined`
 
-jQuery selector that will be used to offset what is considered onscreen. Discourse uses this for example because we have a `position: fixed` header that is on top of content.
+jQuery selector that will be used to offset the top of what is considered onscreen. Discourse uses this for example because we have a `position: fixed; top: 0` header that is on top of content.
+
+####offsetFixedBottom
+Default: `undefined`
+
+jQuery selector that will be used to offset the bottom of what is considered onscreen. Discourse uses this for example because we have a `position: fixed; bottom: 0` composer that is on top of content.
 
 
 ####wrapperTop
