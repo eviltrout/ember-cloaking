@@ -113,8 +113,10 @@
       var childViews = this.get('childViews');
       if ((!childViews) || (childViews.length === 0)) { return; }
 
-      var toUncloak = [],
+      var self = this,
+          toUncloak = [],
           onscreen = [],
+          onscreenCloaks = [],
           // calculating viewport edges
           $w = $(window),
           windowHeight = this.get('wrapperHeight') || ( window.innerHeight ? window.innerHeight : $w.height() ),
@@ -154,6 +156,7 @@
 
         if (viewBottom > windowTop && viewTop <= windowBottom) {
           onscreen.push(view.get('content'));
+          onscreenCloaks.push(view);
         }
 
         bottomView++;
@@ -174,9 +177,22 @@
       }
 
       var toCloak = childViews.slice(0, topView).concat(childViews.slice(bottomView+1));
-      Em.run.schedule('afterRender', function() {
-        toUncloak.forEach(function (v) { v.uncloak(); });
+
+      this._uncloak = toUncloak;
+      if(this._nextUncloak){
+        Em.run.cancel(this._nextUncloak);
+        this._nextUncloak = null;
+      }
+
+      Em.run.schedule('afterRender', this, function() {
+        onscreenCloaks.forEach(function (v) {
+          if(v && v.uncloak) {
+            v.uncloak();
+          }
+        });
         toCloak.forEach(function (v) { v.cloak(); });
+        if(self._nextUncloak){Em.run.cancel(self._nextUncloak)}
+        self._nextUncloak = Em.run.later(self, self.uncloakQueue,50);
       });
 
       for (var j=bottomView; j<childViews.length; j++) {
@@ -189,6 +205,35 @@
         }
       }
 
+    },
+
+    uncloakQueue: function(){
+      var maxPerRun = 3, delay = 50, processed = 0, self = this;
+
+      if(this._uncloak){
+        while(processed < maxPerRun && this._uncloak.length>0){
+          var view = this._uncloak.shift();
+          if(view && view.uncloak && !view._containedView){
+            Em.run.schedule('afterRender', view, view.uncloak);
+            processed++;
+          }
+        }
+        if(this._uncloak.length === 0){
+          this._uncloak = null;
+        } else {
+          Em.run.schedule('afterRender', self, function(){
+            if(self._nextUncloak){
+              Em.run.cancel(self._nextUncloak);
+            }
+            self._nextUncloak = Em.run.next(self, function(){
+              if(self._nextUncloak){
+                Em.run.cancel(self._nextUncloak);
+              }
+              self._nextUncloak = Em.run.later(self,self.uncloakQueue,delay);
+            });
+          });
+        }
+      }
     },
 
     scrollTriggered: function() {
