@@ -83,18 +83,24 @@
     findTopView: function(childViews, viewportTop, min, max) {
       if (max < min) { return min; }
 
-      var mid = Math.floor((min + max) / 2),
-          // in case of not full-window scrolling
-          scrollOffset = this.get('wrapperTop') >> 0,
-          $view = childViews[mid].$(),
-          viewBottom = $view.position().top + scrollOffset + $view.height();
+      var wrapperTop = this.get('wrapperTop')>>0;
 
-      if (viewBottom > viewportTop) {
-        return this.findTopView(childViews, viewportTop, min, mid-1);
-      } else {
-        return this.findTopView(childViews, viewportTop, mid+1, max);
+      while(max>min){
+        var mid = Math.floor((min + max) / 2),
+            // in case of not full-window scrolling
+            $view = childViews[mid].$(),
+            viewBottom = $view.position().top + wrapperTop + $view.height();
+
+        if (viewBottom > viewportTop) {
+          max = mid-1;
+        } else {
+          min = mid+1;
+        }
       }
+
+      return min;
     },
+
 
     /**
       Determine what views are onscreen and cloak/uncloak them as necessary.
