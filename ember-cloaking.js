@@ -54,10 +54,10 @@
       @method _topVisibleChanged
       @observes topVisible
     **/
-    _topVisibleChanged: function() {
+    _topVisibleChanged: Ember.observer('topVisible', function() {
       var controller = this.get('controller');
       if (controller.topVisibleChanged) { controller.topVisibleChanged(this.get('topVisible')); }
-    }.observes('topVisible'),
+    }),
 
     /**
       If the bottommost visible view changed, we will notify the controller if it has an appropriate hook.
@@ -65,10 +65,10 @@
       @method _bottomVisible
       @observes bottomVisible
     **/
-    _bottomVisible: function() {
+    _bottomVisible: Ember.observer('bottomVisible', function() {
       var controller = this.get('controller');
       if (controller.bottomVisibleChanged) { controller.bottomVisibleChanged(this.get('bottomVisible')); }
-    }.observes('bottomVisible'),
+    }),
 
     /**
       Binary search for finding the topmost view on screen.
@@ -118,7 +118,7 @@
           onscreen = [],
           onscreenCloaks = [],
           // calculating viewport edges
-          $w = $(window),
+          $w = Ember.$(window),
           windowHeight = this.get('wrapperHeight') || ( window.innerHeight ? window.innerHeight : $w.height() ),
           windowTop = this.get('wrapperTop') || $w.scrollTop(),
           slack = Math.round(windowHeight * this.get('slackRatio')),
@@ -126,7 +126,7 @@
           windowBottom = windowTop + windowHeight,
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
-          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
+          bodyHeight = this.get('wrapperHeight') ? this.$().height() : Ember.$('body').height(),
           bottomView = topView,
           offsetFixedTopElement = this.get('offsetFixedTopElement'),
           offsetFixedBottomElement = this.get('offsetFixedBottomElement');
@@ -240,7 +240,7 @@
       Em.run.scheduleOnce('afterRender', this, 'scrolled');
     },
 
-    _startEvents: function() {
+    _startEvents: Ember.on('didInsertElement', function() {
       if (this.get('offsetFixed')) {
         Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
       }
@@ -253,32 +253,32 @@
           };
 
       if (offsetFixedTop) {
-        this.set('offsetFixedTopElement', $(offsetFixedTop));
+        this.set('offsetFixedTopElement', Ember.$(offsetFixedTop));
       }
 
       if (offsetFixedBottom) {
-        this.set('offsetFixedBottomElement', $(offsetFixedBottom));
+        this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
       }
 
-      $(document).bind('touchmove.ember-cloak', onScrollMethod);
-      $(window).bind('scroll.ember-cloak', onScrollMethod);
+      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
       this.addObserver('content.@each', self, onScrollMethod);
       this.scrollTriggered();
 
       this.set('scrollingEnabled', true);
-    }.on('didInsertElement'),
+    }),
 
     cleanUp: function() {
-      $(document).unbind('touchmove.ember-cloak');
-      $(window).unbind('scroll.ember-cloak');
+      Ember.$(document).unbind('touchmove.ember-cloak');
+      Ember.$(window).unbind('scroll.ember-cloak');
       this.set('scrollingEnabled', false);
     },
 
-    _endEvents: function() {
+    _endEvents: Ember.on('willDestroyElement', function() {
       this.cleanUp();
-    }.on('willDestroyElement')
+    })
   });
 
 
@@ -372,15 +372,15 @@
       }
     },
 
-    _removeContainedView: function(){
+    _removeContainedView: Ember.on('willDestroyElement', function(){
       if(this._containedView){
         this._containedView.remove();
         this._containedView = null;
       }
       this._super();
-    }.on('willDestroyElement'),
+    }),
 
-    _setHeights: function(){
+    _setHeights: Ember.on('didInsertElement', function(){
       if (!this._containedView) {
         // setting default height
         // but do not touch if height already defined
@@ -393,7 +393,7 @@
           this.$().css('height', defaultHeight);
         }
       }
-     }.on('didInsertElement'),
+    }),
 
     /**
       Render the cloaked view if applicable.
