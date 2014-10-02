@@ -12,7 +12,7 @@
     bottomVisible: null,
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
-    loadingHTML: "Loading...",
+    loadingHTML: 'Loading...',
     scrollDebounce: 10,
 
     init: function() {
@@ -27,7 +27,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
-        preservesContext: this.get('preservesContext') === "true",
+        preservesContext: this.get('preservesContext') === 'true',
         cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight'),
 
