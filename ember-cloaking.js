@@ -13,7 +13,7 @@
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
     loadingHTML: 'Loading...',
-    scrollDebounce: 10,
+    _scrollDebounce: 10,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -252,7 +252,7 @@
           offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
           offsetFixedBottom = this.get('offsetFixedBottom'),
           onScrollMethod = function() {
-            Ember.run.debounce(self, 'scrollTriggered', self.get('scrollDebounce'));
+            Ember.run.debounce(self, 'scrollTriggered', self._scrollDebounce);
           };
 
       if (offsetFixedTop) {
