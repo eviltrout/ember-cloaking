@@ -15,8 +15,6 @@
     loadingHTML: "Loading...",
 
     init: function() {
-      console.log("init")
-      window.cloakedView = this;
       var cloakView = this.get('cloakView'),
           idProperty = this.get('idProperty'),
           uncloakDefault = !!this.get('uncloakDefault');
@@ -58,7 +56,6 @@
       @observes topVisible
     **/
     _topVisibleChanged: Ember.observer('topVisible', function() {
-      console.log("_topVisibleChanged")
       var controller = this.get('controller');
       if (controller.topVisibleChanged) { controller.topVisibleChanged(this.get('topVisible')); }
     }),
@@ -70,7 +67,6 @@
       @observes bottomVisible
     **/
     _bottomVisible: Ember.observer('bottomVisible', function() {
-      console.log("_bottomVisible")
       var controller = this.get('controller');
       if (controller.bottomVisibleChanged) { controller.bottomVisibleChanged(this.get('bottomVisible')); }
     }),
@@ -86,7 +82,6 @@
       @returns {Number} the index into childViews of the topmost view
     **/
     findTopView: function(childViews, viewportTop, min, max) {
-      console.log("findTopView")
       if (max < min) { return min; }
 
       var wrapperTop = this.get('wrapperTop')>>0;
@@ -114,7 +109,6 @@
       @method scrolled
     **/
     scrolled: function() {
-      console.log("scrolled")
       if (!this.get('scrollingEnabled')) { return; }
 
       var childViews = this.get('childViews');
@@ -215,7 +209,6 @@
     },
 
     uncloakQueue: function(){
-      console.log("uncloakQueue")
       var maxPerRun = 3, delay = 50, processed = 0, self = this;
 
       if(this._uncloak){
@@ -230,7 +223,6 @@
           this._uncloak = null;
         } else {
           Em.run.schedule('afterRender', self, function(){
-            console.log("uncloakQueue-afterRender")
             if(self._nextUncloak){
               Em.run.cancel(self._nextUncloak);
             }
@@ -246,12 +238,10 @@
     },
 
     scrollTriggered: function() {
-      console.log("scrollTriggered")
       Em.run.scheduleOnce('afterRender', this, 'scrolled');
     },
 
     _startEvents: Ember.on('didInsertElement', function() {
-      console.log("_startEvents")
 
       if (this.get('offsetFixed')) {
         Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
@@ -283,7 +273,6 @@
     }),
 
     cleanUp: function() {
-      console.log("cleanUp")
       Ember.$(document).unbind('touchmove.ember-cloak');
       Ember.$(window).unbind('scroll.ember-cloak');
       this.set('scrollingEnabled', false);
@@ -311,7 +300,6 @@
       @method uncloak
     */
     uncloak: function() {
-      console.log("uncloak")
       var state = this._state || this.state;
       if (state !== 'inDOM' && state !== 'preRender') { return; }
 
@@ -357,7 +345,6 @@
           loading: false
         });
 
-        console.log("childViewS: " + this.get("childViews.length"));
         this.pushObject(this.createChildView(this.get('cloaks'), createArgs))
         this.rerender();
       }
@@ -369,7 +356,6 @@
       @method cloak
     */
     cloak: function() {
-      console.log("cloak")
       var self = this;
 
       if (this.get("childViews.length") && (this._state || this.state) === 'inDOM') {
@@ -384,13 +370,11 @@
             self.removeObject(view);
             view.remove();
           });
-          console.log("cloak-afterRender")
         });
       }
     },
 
     _setHeights: Ember.on('didInsertElement', function(){
-      console.log("_setHeights")
       if (!this.get("childViews.length")) {
         // setting default height
         // but do not touch if height already defined
