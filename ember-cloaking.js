@@ -13,6 +13,7 @@
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
     loadingHTML: "Loading...",
+    scrollDebounce: 10,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -198,7 +199,7 @@
 
       for (var j=bottomView; j<childViews.length; j++) {
         var checkView = childViews[j];
-        if (!checkView.get("childViews.length")) {
+        if (!checkView.get('childViews.length')) {
           if (!checkView.get('loading') && this.get('loadingHTML')) {
             checkView.$().html(this.get('loadingHTML'));
           }
@@ -214,7 +215,7 @@
       if(this._uncloak){
         while(processed < maxPerRun && this._uncloak.length>0){
           var view = this._uncloak.shift();
-          if(view && view.uncloak && !view.get("childViews.length")){
+          if(view && view.uncloak && !view.get('childViews.length')){
             Em.run.schedule('afterRender', view, view.uncloak);
             processed++;
           }
@@ -251,7 +252,7 @@
           offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
           offsetFixedBottom = this.get('offsetFixedBottom'),
           onScrollMethod = function() {
-            Ember.run.debounce(self, 'scrollTriggered', 10);
+            Ember.run.debounce(self, 'scrollTriggered', self.get('scrollDebounce'));
           };
 
       if (offsetFixedTop) {
@@ -303,7 +304,7 @@
       var state = this._state || this.state;
       if (state !== 'inDOM' && state !== 'preRender') { return; }
 
-      if (!this.get("childViews.length")) {
+      if (!this.get('childViews.length')) {
         var model = this.get('content'),
             controller = null,
             container = this.get('container');
@@ -358,7 +359,7 @@
     cloak: function() {
       var self = this;
 
-      if (this.get("childViews.length") && (this._state || this.state) === 'inDOM') {
+      if (this.get('childViews.length') && (this._state || this.state) === 'inDOM') {
         var style = 'height: ' + this.$().height() + 'px;';
         this.set('style', style);
         this.$().prop('style', style);
@@ -366,7 +367,7 @@
         // We need to remove the container after the height of the element has taken
         // effect.
         Ember.run.schedule('afterRender', function() {
-          self.get("childViews").forEach(function(view) {
+          self.get('childViews').forEach(function(view) {
             self.removeObject(view);
             view.remove();
           });
@@ -375,7 +376,7 @@
     },
 
     _setHeights: Ember.on('didInsertElement', function(){
-      if (!this.get("childViews.length")) {
+      if (!this.get('childViews.length')) {
         // setting default height
         // but do not touch if height already defined
         if(!this.$().height()){
