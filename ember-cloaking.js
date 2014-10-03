@@ -15,6 +15,7 @@
     offsetFixedBottomElement: null,
     loadingHTML: 'Loading...',
     _scrollDebounce: 10,
+    _scrollSelector: window,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -264,8 +265,9 @@
         this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
       }
 
-      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
-      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
+      _scrollSelector = this.get("_scrollSelector");
+      Ember.$(_scrollSelector).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(_scrollSelector).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
       this.addObserver('content.@each', self, onScrollMethod);
@@ -275,8 +277,9 @@
     }),
 
     cleanUp: function() {
-      Ember.$(document).unbind('touchmove.ember-cloak');
-      Ember.$(window).unbind('scroll.ember-cloak');
+      _scrollSelector = this.get("_scrollSelector");
+      Ember.$(_scrollSelector).unbind('touchmove.ember-cloak');
+      Ember.$(_scrollSelector).unbind('scroll.ember-cloak');
       this.set('scrollingEnabled', false);
     },
 
