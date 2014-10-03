@@ -200,7 +200,7 @@
 
       for (var j=bottomView; j<childViews.length; j++) {
         var checkView = childViews[j];
-        if (!checkView.get('childViews.length')) {
+        if (!checkView.get('hasChildViews')) {
           if (!checkView.get('loading') && this.get('loadingHTML')) {
             checkView.$().html(this.get('loadingHTML'));
           }
@@ -216,7 +216,7 @@
       if(this._uncloak){
         while(processed < maxPerRun && this._uncloak.length>0){
           var view = this._uncloak.shift();
-          if(view && view.uncloak && !view.get('childViews.length')){
+          if(view && view.uncloak && !view.get('hasChildViews')){
             Em.run.schedule('afterRender', view, view.uncloak);
             processed++;
           }
@@ -295,6 +295,7 @@
   **/
   Ember.CloakedView = Ember.ContainerView.extend({
     attributeBindings: ['style'],
+    hasChildViews: Ember.computed.alias('childViews.length'),
 
     /**
       Triggers the set up for rendering a view that is cloaked.
@@ -305,7 +306,7 @@
       var state = this._state || this.state;
       if (state !== 'inDOM' && state !== 'preRender') { return; }
 
-      if (!this.get('childViews.length')) {
+      if (!this.get('hasChildViews')) {
         var model = this.get('content'),
             controller = null,
             container = this.get('container');
@@ -360,7 +361,7 @@
     cloak: function() {
       var self = this;
 
-      if (this.get('childViews.length') && (this._state || this.state) === 'inDOM') {
+      if (this.get('hasChildViews') && (this._state || this.state) === 'inDOM') {
         var style = 'height: ' + this.$().height() + 'px;';
         this.set('style', style);
         this.$().prop('style', style);
@@ -377,7 +378,7 @@
     },
 
     _setHeights: Ember.on('didInsertElement', function(){
-      if (!this.get('childViews.length')) {
+      if (!this.get('hasChildViews')) {
         // setting default height
         // but do not touch if height already defined
         if(!this.$().height()){
