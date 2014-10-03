@@ -8,10 +8,14 @@
     @namespace Ember
   **/
   Ember.CloakedCollectionView = Ember.CollectionView.extend({
+    cloakView: Ember.computed.alias('itemViewClass'),
     topVisible: null,
     bottomVisible: null,
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
+    loadingHTML: 'Loading...',
+    _scrollDebounce: 10,
+    _scrollSelector: window,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -25,7 +29,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
-        preservesContext: this.get('preservesContext') === "true",
+        preservesContext: this.get('preservesContext') === 'true',
         cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight'),
 
@@ -197,9 +201,9 @@
 
       for (var j=bottomView; j<childViews.length; j++) {
         var checkView = childViews[j];
-        if (!checkView._containedView) {
-          if (!checkView.get('loading')) {
-            checkView.$().html(this.get('loadingHTML') || "Loading...");
+        if (!checkView.get('hasChildViews')) {
+          if (!checkView.get('loading') && this.get('loadingHTML')) {
+            checkView.$().html(this.get('loadingHTML'));
           }
           return;
         }
@@ -213,7 +217,7 @@
       if(this._uncloak){
         while(processed < maxPerRun && this._uncloak.length>0){
           var view = this._uncloak.shift();
-          if(view && view.uncloak && !view._containedView){
+          if(view && view.uncloak && !view.get('hasChildViews')){
             Em.run.schedule('afterRender', view, view.uncloak);
             processed++;
           }
@@ -241,6 +245,7 @@
     },
 
     _startEvents: Ember.on('didInsertElement', function() {
+
       if (this.get('offsetFixed')) {
         Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
       }
@@ -249,7 +254,7 @@
           offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
           offsetFixedBottom = this.get('offsetFixedBottom'),
           onScrollMethod = function() {
-            Ember.run.debounce(self, 'scrollTriggered', 10);
+            Ember.run.debounce(self, 'scrollTriggered', self._scrollDebounce);
           };
 
       if (offsetFixedTop) {
@@ -260,8 +265,9 @@
         this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
       }
 
-      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
-      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
+      _scrollSelector = this.get("_scrollSelector");
+      Ember.$(_scrollSelector).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(_scrollSelector).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
       this.addObserver('content.@each', self, onScrollMethod);
@@ -271,8 +277,9 @@
     }),
 
     cleanUp: function() {
-      Ember.$(document).unbind('touchmove.ember-cloak');
-      Ember.$(window).unbind('scroll.ember-cloak');
+      _scrollSelector = this.get("_scrollSelector");
+      Ember.$(_scrollSelector).unbind('touchmove.ember-cloak');
+      Ember.$(_scrollSelector).unbind('scroll.ember-cloak');
       this.set('scrollingEnabled', false);
     },
 
@@ -289,8 +296,9 @@
     @extends Ember.View
     @namespace Ember
   **/
-  Ember.CloakedView = Ember.View.extend({
+  Ember.CloakedView = Ember.ContainerView.extend({
     attributeBindings: ['style'],
+    hasChildViews: Ember.computed.alias('childViews.length'),
 
     /**
       Triggers the set up for rendering a view that is cloaked.
@@ -301,7 +309,7 @@
       var state = this._state || this.state;
       if (state !== 'inDOM' && state !== 'preRender') { return; }
 
-      if (!this._containedView) {
+      if (!this.get('hasChildViews')) {
         var model = this.get('content'),
             controller = null,
             container = this.get('container');
@@ -343,7 +351,7 @@
           loading: false
         });
 
-        this._containedView = this.createChildView(this.get('cloaks'), createArgs);
+        this.pushObject(this.createChildView(this.get('cloaks'), createArgs))
         this.rerender();
       }
     },
@@ -356,7 +364,7 @@
     cloak: function() {
       var self = this;
 
-      if (this._containedView && (this._state || this.state) === 'inDOM') {
+      if (this.get('hasChildViews') && (this._state || this.state) === 'inDOM') {
         var style = 'height: ' + this.$().height() + 'px;';
         this.set('style', style);
         this.$().prop('style', style);
@@ -364,24 +372,16 @@
         // We need to remove the container after the height of the element has taken
         // effect.
         Ember.run.schedule('afterRender', function() {
-          if(self._containedView){
-            self._containedView.remove();
-            self._containedView = null;
-          }
+          self.get('childViews').forEach(function(view) {
+            self.removeObject(view);
+            view.remove();
+          });
         });
       }
     },
 
-    _removeContainedView: Ember.on('willDestroyElement', function(){
-      if(this._containedView){
-        this._containedView.remove();
-        this._containedView = null;
-      }
-      this._super();
-    }),
-
     _setHeights: Ember.on('didInsertElement', function(){
-      if (!this._containedView) {
+      if (!this.get('hasChildViews')) {
         // setting default height
         // but do not touch if height already defined
         if(!this.$().height()){
@@ -393,28 +393,7 @@
           this.$().css('height', defaultHeight);
         }
       }
-    }),
-
-    /**
-      Render the cloaked view if applicable.
-
-      @method render
-    */
-    render: function(buffer) {
-      var containedView = this._containedView, self = this;
-
-      if (containedView && (containedView._state || containedView.state) !== 'inDOM') {
-        containedView.triggerRecursively('willInsertElement');
-        containedView.renderToBuffer(buffer);
-        containedView.transitionTo('inDOM');
-        Em.run.schedule('afterRender', function() {
-          if(self._containedView) {
-            self._containedView.triggerRecursively('didInsertElement');
-          }
-        });
-      }
-    }
-
+    })
   });
 
 
