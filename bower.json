@@ -1,6 +1,6 @@
 {
   "name": "ember-cloaking",
-  "version": "1.0.0-beta3",
+  "version": "1.0.0-beta4",
   "main": "./ember-cloaking.js",
   "dependencies": {
     "ember": ">=1.3.0"
