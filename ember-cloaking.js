@@ -8,6 +8,7 @@
     @namespace Ember
   **/
   Ember.CloakedCollectionView = Ember.CollectionView.extend({
+    cloakView: Ember.computed.alias('itemViewClass'),
     topVisible: null,
     bottomVisible: null,
     offsetFixedTopElement: null,
