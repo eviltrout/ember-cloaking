@@ -43,5 +43,6 @@
   ],
   "ember-addon": {
     "configPath": "tests/dummy/config"
-  }
+  },
+  "ember-addon-main": "./addon/cloaking.js"
 }
