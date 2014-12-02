@@ -406,7 +406,7 @@
       if (containedView && (containedView._state || containedView.state) !== 'inDOM') {
         containedView.triggerRecursively('willInsertElement');
         containedView.renderToBuffer(buffer);
-        containedView.transitionTo('inDOM');
+        containedView._transitionTo('inDOM');
         Em.run.schedule('afterRender', function() {
           if(self._containedView) {
             self._containedView.triggerRecursively('didInsertElement');
