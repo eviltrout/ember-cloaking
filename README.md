@@ -19,10 +19,10 @@ Usage
 2. To display a collection of cloaked items, use `{{cloaked-collection}}` in your handlebars templates like this:
 
 ```handlebars
-  {{cloaked-collection cloakView="post" content=postStream.posts}}
+  {{cloaked-collection itemViewClass="post" content=postStream.posts}}
 ```
 
-`cloakView` is the name of the view to render in the collection. `post` would render `PostView`.
+`itemViewClass` is the name of the view to render in the collection. `post` would render `PostView`.
 
 `content` is the collection of items to display.
 
@@ -56,7 +56,7 @@ Set to "true" if you want to use `content.xyz` in your views instead of the `con
 ####idProperty
 Default: `undefined`
 
-Name of item's property to generate cloaked view DOM id. If set `id` will be generated using `cloakView` like so: `{{cloakView}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
+Name of item's property to generate cloaked view DOM id. If set `id` will be generated using `itemViewClass` like so: `{{itemViewClass}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
 
 
 ####offsetFixedTop
@@ -88,13 +88,19 @@ Default: `false`
 Whether or not to uncloak views by default when created. This is useful for sites like Discourse
 that perform infinite scrolling upwards, and depend on inserting elements above the top fold.
 
-iScroll or other scrollers
+
+###scrollDebounce
+Default: 10
+
+The amount of debouncing in ms that will be considered for cloaking. You probably don't have to change
+this value.
+
 --------------------------
 
 [Demo](/demos/iscroll.html)
 
 ```handlebars
-  {{cloaked-collection cloakView="item" content=model wrapperTopBinding="view.scrollTop" wrapperHeightBinding="view.height"}}
+  {{cloaked-collection itemViewClass="item" content=model wrapperTopBinding="view.scrollTop" wrapperHeightBinding="view.height"}}
 ```
 
 `wrapperTop` is the current scroll position like native [element.scrollTop](https://developer.mozilla.org/en-US/docs/Web/API/Element.scrollTop)

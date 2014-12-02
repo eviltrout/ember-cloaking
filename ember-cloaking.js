@@ -8,10 +8,13 @@
     @namespace Ember
   **/
   Ember.CloakedCollectionView = Ember.CollectionView.extend({
+    cloakView: Ember.computed.alias('itemViewClass'),
     topVisible: null,
     bottomVisible: null,
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
+    loadingHTML: 'Loading...',
+    scrollDebounce: 10,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -25,7 +28,7 @@
       this.set('itemViewClass', Ember.CloakedView.extend({
         classNames: [cloakView + '-cloak'],
         cloaks: cloakView,
-        preservesContext: this.get('preservesContext') === "true",
+        preservesContext: this.get('preservesContext') === 'true',
         cloaksController: this.get('itemController'),
         defaultHeight: this.get('defaultHeight'),
 
@@ -199,12 +202,11 @@
         var checkView = childViews[j];
         if (!checkView._containedView) {
           if (!checkView.get('loading')) {
-            checkView.$().html(this.get('loadingHTML') || "Loading...");
+            checkView.$().html(this.get('loadingHTML'));
           }
           return;
         }
       }
-
     },
 
     uncloakQueue: function(){
@@ -248,8 +250,9 @@
       var self = this,
           offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
           offsetFixedBottom = this.get('offsetFixedBottom'),
+          scrollDebounce = this.get('scrollDebounce'),
           onScrollMethod = function() {
-            Ember.run.debounce(self, 'scrollTriggered', 10);
+            Ember.run.debounce(self, 'scrollTriggered', scrollDebounce);
           };
 
       if (offsetFixedTop) {
