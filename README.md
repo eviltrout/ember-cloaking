@@ -6,6 +6,12 @@ lowered memory usage.
 
 Extracted from [Discourse](https://github.com/discourse/discourse)'s infinite scrolling.
 
+Import Version Notes
+====================
+
+The latest version has been upgraded to work with Ember 1.8.1. If you need support for older
+versions of Ember, use the '1.7.1' branch.
+
 Usage
 =====
 
