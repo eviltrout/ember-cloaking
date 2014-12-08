@@ -121,7 +121,7 @@
           onscreen = [],
           onscreenCloaks = [],
           // calculating viewport edges
-          $w = $(window),
+          $w = Ember.$(window),
           windowHeight = this.get('wrapperHeight') || ( window.innerHeight ? window.innerHeight : $w.height() ),
           windowTop = this.get('wrapperTop') || $w.scrollTop(),
           slack = Math.round(windowHeight * this.get('slackRatio')),
@@ -256,15 +256,15 @@
           };
 
       if (offsetFixedTop) {
-        this.set('offsetFixedTopElement', $(offsetFixedTop));
+        this.set('offsetFixedTopElement', Ember.$(offsetFixedTop));
       }
 
       if (offsetFixedBottom) {
-        this.set('offsetFixedBottomElement', $(offsetFixedBottom));
+        this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
       }
 
-      $(document).bind('touchmove.ember-cloak', onScrollMethod);
-      $(window).bind('scroll.ember-cloak', onScrollMethod);
+      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
       this.addObserver('wrapperTop', self, onScrollMethod);
       this.addObserver('wrapperHeight', self, onScrollMethod);
       this.addObserver('content.@each', self, onScrollMethod);
@@ -274,8 +274,8 @@
     }.on('didInsertElement'),
 
     cleanUp: function() {
-      $(document).unbind('touchmove.ember-cloak');
-      $(window).unbind('scroll.ember-cloak');
+      Ember.$(document).unbind('touchmove.ember-cloak');
+      Ember.$(window).unbind('scroll.ember-cloak');
       this.set('scrollingEnabled', false);
     },
 
