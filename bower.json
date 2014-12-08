@@ -1,6 +1,6 @@
 {
   "name": "ember-cloaking",
-  "version": "1.0.0-beta4",
+  "version": "1.0.0-beta5",
   "main": "./ember-cloaking.js",
   "dependencies": {
     "handlebars": "~1.3.0",

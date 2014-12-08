@@ -4,7 +4,7 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/coffee-script/1.6.3/coffee-script.min.js"></script>
   <script src="http:///cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.js"></script>
-  <script src="http://builds.emberjs.com/ember-latest.js"></script>
+  <script src="http://builds.emberjs.com/tags/v1.8.1/ember.js"></script>
   <script src="../ember-cloaking.js"></script>
   <style>
     .ember-view {
@@ -56,10 +56,10 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="scroll">
-    {{cloaked-collection cloakView="item" content=model}}
+    {{cloaked-collection itemViewClass="item" content=model}}
   </script>
     <script type="text/x-handlebars" data-template-name="item">
-      <div {{action greeting}}>
+      <div {{action "greeting"}}>
         #{{id}} ({{height}}px)
       </div>
   </script>
