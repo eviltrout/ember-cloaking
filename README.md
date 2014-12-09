@@ -95,6 +95,7 @@ Default: 10
 The amount of debouncing in ms that will be considered for cloaking. You probably don't have to change
 this value.
 
+iScroll or other scrollers
 --------------------------
 
 [Demo](/demos/iscroll.html)
