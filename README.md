@@ -12,11 +12,33 @@ Import Version Notes
 The latest version has been upgraded to work with Ember 1.8.1. If you need support for older
 versions of Ember, use the '1.7.1' branch.
 
-Usage
-=====
 
-1. Include `ember-cloaking.js` in your project.
-2. To display a collection of cloaked items, use `{{cloaked-collection}}` in your handlebars templates like this:
+##Important Version Notes
+The latest version has been upgraded to work with Ember 1.8.1. If you need support for older
+versions of Ember, use the '1.7.1' branch.
+
+
+##Installation
+
+###with ES6 & Ember-Cli
+
+Ember Cloaking is an Ember-addon, all that's required to start using cloaking views and helpers
+in your project is bower installation.
+
+`bower install --save ember-cloaking`
+
+###with Globals
+
+Either `bower install --save ember-cloaking` or download and include `ember-cloaking.js`
+in your project directly. The bower install will download the entire project, including
+both the ES6 version and the browserified version of ember cloaking.  For globals based
+apps, you'll want to `require` or directly include the `ember-cloaking.js` found in project
+root.
+
+
+##Usage
+
+To display a collection of cloaked items, use `{{cloaked-collection}}` in your handlebars templates like this:
 
 ```handlebars
   {{cloaked-collection itemViewClass="post" content=postStream.posts}}
@@ -56,7 +78,8 @@ Set to "true" if you want to use `content.xyz` in your views instead of the `con
 ####idProperty
 Default: `undefined`
 
-Name of item's property to generate cloaked view DOM id. If set `id` will be generated using `itemViewClass` like so: `{{itemViewClass}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
+Name of item's property to generate cloaked view DOM id. If set `id` will be generated
+using `itemViewClass` like so: `{{itemViewClass}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
 
 
 ####offsetFixedTop
