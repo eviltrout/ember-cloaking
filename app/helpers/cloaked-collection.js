@@ -1,9 +1,9 @@
 import Ember from "ember";
 import CloakedCollectionView from "../views/cloaked-collection";
 
-export default function(options) {
+export default function cloakedCollectionHelper(options) {
   var hash = options.hash,
-    types = options.hashTypes;
+      types = options.hashTypes;
 
   for (var prop in hash) {
     if (types[prop] === 'ID') {

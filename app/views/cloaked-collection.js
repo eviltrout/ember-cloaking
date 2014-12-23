@@ -9,14 +9,14 @@ import CloakedView from "./cloaked";
  @namespace Ember
  **/
 export default Ember.CollectionView.extend({
+
   cloakView: Ember.computed.alias('itemViewClass'),
   topVisible: null,
   bottomVisible: null,
   offsetFixedTopElement: null,
   offsetFixedBottomElement: null,
   loadingHTML: 'Loading...',
-  _scrollDebounce: 10,
-  _scrollSelector: window,
+  scrollDebounce: 10,
 
   init: function() {
     var cloakView = this.get('cloakView'),
@@ -59,10 +59,10 @@ export default Ember.CollectionView.extend({
    @method _topVisibleChanged
    @observes topVisible
    **/
-  _topVisibleChanged: Ember.observer('topVisible', function() {
+  _topVisibleChanged: function() {
     var controller = this.get('controller');
     if (controller.topVisibleChanged) { controller.topVisibleChanged(this.get('topVisible')); }
-  }),
+  }.observes('topVisible'),
 
   /**
    If the bottommost visible view changed, we will notify the controller if it has an appropriate hook.
@@ -70,10 +70,10 @@ export default Ember.CollectionView.extend({
    @method _bottomVisible
    @observes bottomVisible
    **/
-  _bottomVisible: Ember.observer('bottomVisible', function() {
+  _bottomVisible: function() {
     var controller = this.get('controller');
     if (controller.bottomVisibleChanged) { controller.bottomVisibleChanged(this.get('bottomVisible')); }
-  }),
+  }.observes('bottomVisible'),
 
   /**
    Binary search for finding the topmost view on screen.
@@ -173,7 +173,7 @@ export default Ember.CollectionView.extend({
     if (onscreen.length) {
       this.setProperties({topVisible: onscreen[0], bottomVisible: onscreen[onscreen.length-1]});
       if (controller && controller.sawObjects) {
-        Em.run.schedule('afterRender', function() {
+        Ember.run.schedule('afterRender', function() {
           controller.sawObjects(onscreen);
         });
       }
@@ -185,25 +185,25 @@ export default Ember.CollectionView.extend({
 
     this._uncloak = toUncloak;
     if(this._nextUncloak){
-      Em.run.cancel(this._nextUncloak);
+      Ember.run.cancel(this._nextUncloak);
       this._nextUncloak = null;
     }
 
-    Em.run.schedule('afterRender', this, function() {
+    Ember.run.schedule('afterRender', this, function() {
       onscreenCloaks.forEach(function (v) {
         if(v && v.uncloak) {
           v.uncloak();
         }
       });
       toCloak.forEach(function (v) { v.cloak(); });
-      if (self._nextUncloak) { Em.run.cancel(self._nextUncloak); }
-      self._nextUncloak = Em.run.later(self, self.uncloakQueue,50);
+      if (self._nextUncloak) { Ember.run.cancel(self._nextUncloak); }
+      self._nextUncloak = Ember.run.later(self, self.uncloakQueue,50);
     });
 
     for (var j=bottomView; j<childViews.length; j++) {
       var checkView = childViews[j];
-      if (!checkView.get('hasChildViews')) {
-        if (!checkView.get('loading') && this.get('loadingHTML')) {
+      if (!checkView._containedView) {
+        if (!checkView.get('loading')) {
           checkView.$().html(this.get('loadingHTML'));
         }
         return;
@@ -218,23 +218,23 @@ export default Ember.CollectionView.extend({
     if(this._uncloak){
       while(processed < maxPerRun && this._uncloak.length>0){
         var view = this._uncloak.shift();
-        if(view && view.uncloak && !view.get('hasChildViews')){
-          Em.run.schedule('afterRender', view, view.uncloak);
+        if(view && view.uncloak && !view._containedView){
+          Ember.run.schedule('afterRender', view, view.uncloak);
           processed++;
         }
       }
       if(this._uncloak.length === 0){
         this._uncloak = null;
       } else {
-        Em.run.schedule('afterRender', self, function(){
+        Ember.run.schedule('afterRender', self, function(){
           if(self._nextUncloak){
-            Em.run.cancel(self._nextUncloak);
+            Ember.run.cancel(self._nextUncloak);
           }
-          self._nextUncloak = Em.run.next(self, function(){
+          self._nextUncloak = Ember.run.next(self, function(){
             if(self._nextUncloak){
-              Em.run.cancel(self._nextUncloak);
+              Ember.run.cancel(self._nextUncloak);
             }
-            self._nextUncloak = Em.run.later(self,self.uncloakQueue,delay);
+            self._nextUncloak = Ember.run.later(self,self.uncloakQueue,delay);
           });
         });
       }
@@ -242,20 +242,21 @@ export default Ember.CollectionView.extend({
   },
 
   scrollTriggered: function() {
-    Em.run.scheduleOnce('afterRender', this, 'scrolled');
+    Ember.run.scheduleOnce('afterRender', this, 'scrolled');
   },
 
-  _startEvents: Ember.on('didInsertElement', function() {
+  _startEvents: function() {
 
     if (this.get('offsetFixed')) {
-      Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
+      Ember.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
     }
 
     var self = this,
       offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
       offsetFixedBottom = this.get('offsetFixedBottom'),
+      scrollDebounce = this.get('scrollDebounce'),
       onScrollMethod = function() {
-        Ember.run.debounce(self, 'scrollTriggered', self._scrollDebounce);
+        Ember.run.debounce(self, 'scrollTriggered', scrollDebounce);
       };
 
     if (offsetFixedTop) {
@@ -266,25 +267,24 @@ export default Ember.CollectionView.extend({
       this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
     }
 
-    _scrollSelector = this.get("_scrollSelector");
-    Ember.$(_scrollSelector).bind('touchmove.ember-cloak', onScrollMethod);
-    Ember.$(_scrollSelector).bind('scroll.ember-cloak', onScrollMethod);
+    Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
+    Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
     this.addObserver('wrapperTop', self, onScrollMethod);
     this.addObserver('wrapperHeight', self, onScrollMethod);
     this.addObserver('content.@each', self, onScrollMethod);
     this.scrollTriggered();
 
     this.set('scrollingEnabled', true);
-  }),
+
+  }.on('didInsertElement'),
 
   cleanUp: function() {
-    _scrollSelector = this.get("_scrollSelector");
-    Ember.$(_scrollSelector).unbind('touchmove.ember-cloak');
-    Ember.$(_scrollSelector).unbind('scroll.ember-cloak');
+    Ember.$(document).unbind('touchmove.ember-cloak');
+    Ember.$(window).unbind('scroll.ember-cloak');
     this.set('scrollingEnabled', false);
   },
 
-  _endEvents: Ember.on('willDestroyElement', function() {
+  _endEvents: function() {
     this.cleanUp();
-  })
+  }.on('willDestroyElement')
 });

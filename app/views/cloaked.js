@@ -7,9 +7,53 @@ import Ember from "ember";
  @extends Ember.View
  @namespace Ember
  **/
-export default Ember.ContainerView.extend({
+export default Ember.View.extend({
   attributeBindings: ['style'],
-  hasChildViews: Ember.computed.alias('childViews.length'),
+
+  _containedView : null,
+  _scheduled : null,
+
+  init : function () {
+    this._super();
+    this._scheduled = false;
+    this._childViews = [];
+  },
+
+  setContainedView : function (cv) {
+    if (this._childViews[0]) {
+      this._childViews[0].destroy();
+      this._childViews[0] = cv;
+    }
+
+    if (cv) {
+      cv.set('_parentView', this);
+      cv.set('templateData', this.get('templateData'));
+      this._childViews[0] = cv;
+    } else {
+      this._childViews.clear();
+    }
+
+    if (!this._elementCreated || this._scheduled) return;
+
+    this._scheduled = true;
+    this.set('_containedView', cv);
+    Ember.run.schedule('render', this, this.updateChildView);
+  },
+
+  render : function (buffer) {
+    var el = buffer.element();
+    this._childViewsMorph = buffer.dom.createMorph(el, null, null, el);
+  },
+
+  updateChildView : function () {
+    this._scheduled = false;
+    if (!this._elementCreated | this.isDestroying || this.isDestroyed) { return; }
+
+    var childView = this._containedView;
+    if (childView && !childView._elementCreated) {
+      this._renderer.renderTree(childView, this, 0);
+    }
+  },
 
   /**
    Triggers the set up for rendering a view that is cloaked.
@@ -20,7 +64,7 @@ export default Ember.ContainerView.extend({
     var state = this._state || this.state;
     if (state !== 'inDOM' && state !== 'preRender') { return; }
 
-    if (!this.get('hasChildViews')) {
+    if (!this._containedView) {
       var model = this.get('content'),
         controller = null,
         container = this.get('container');
@@ -62,8 +106,7 @@ export default Ember.ContainerView.extend({
         loading: false
       });
 
-      this.pushObject(this.createChildView(this.get('cloaks'), createArgs))
-      this.rerender();
+      this.setContainedView(this.createChildView(this.get('cloaks'), createArgs));
     }
   },
 
@@ -75,7 +118,7 @@ export default Ember.ContainerView.extend({
   cloak: function() {
     var self = this;
 
-    if (this.get('hasChildViews') && (this._state || this.state) === 'inDOM') {
+    if (this._containedView && (this._state || this.state) === 'inDOM') {
       var style = 'height: ' + this.$().height() + 'px;';
       this.set('style', style);
       this.$().prop('style', style);
@@ -83,16 +126,13 @@ export default Ember.ContainerView.extend({
       // We need to remove the container after the height of the element has taken
       // effect.
       Ember.run.schedule('afterRender', function() {
-        self.get('childViews').forEach(function(view) {
-          self.removeObject(view);
-          view.remove();
-        });
+        self.setContainedView(null);
       });
     }
   },
 
-  _setHeights: Ember.on('didInsertElement', function(){
-    if (!this.get('hasChildViews')) {
+  _setHeights: function(){
+    if (!this._containedView) {
       // setting default height
       // but do not touch if height already defined
       if(!this.$().height()){
@@ -104,5 +144,5 @@ export default Ember.ContainerView.extend({
         this.$().css('height', defaultHeight);
       }
     }
-  })
+  }.on('didInsertElement')
 });
