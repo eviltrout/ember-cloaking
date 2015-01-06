@@ -28,7 +28,7 @@ export default Ember.CollectionView.extend({
     if (!slackRatio) { this.set('slackRatio', 1.0); }
 
     this.set('itemViewClass', CloakedView.extend({
-      classNames: [cloakView + '-cloak'],
+      classNames: [cloakView + '-cloak', 'cloak-view'],
       cloaks: cloakView,
       preservesContext: this.get('preservesContext') === 'true',
       cloaksController: this.get('itemController'),
@@ -255,7 +255,8 @@ export default Ember.CollectionView.extend({
       offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
       offsetFixedBottom = this.get('offsetFixedBottom'),
       scrollDebounce = this.get('scrollDebounce'),
-      onScrollMethod = function() {
+      scrollSelector = this.get('scrollSelector'),
+      onScrollMethod = function(e) {
         Ember.run.debounce(self, 'scrollTriggered', scrollDebounce);
       };
 
@@ -267,8 +268,14 @@ export default Ember.CollectionView.extend({
       this.set('offsetFixedBottomElement', Ember.$(offsetFixedBottom));
     }
 
-    Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
-    Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
+    if (scrollSelector) {
+      Ember.$(scrollSelector).bind('scroll.ember-cloak', onScrollMethod);
+      Ember.$(scrollSelector).bind('touchmove.ember-cloak', onScrollMethod);
+    } else {
+      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
+    }
+
     this.addObserver('wrapperTop', self, onScrollMethod);
     this.addObserver('wrapperHeight', self, onScrollMethod);
     this.addObserver('content.@each', self, onScrollMethod);
@@ -279,8 +286,16 @@ export default Ember.CollectionView.extend({
   }.on('didInsertElement'),
 
   cleanUp: function() {
-    Ember.$(document).unbind('touchmove.ember-cloak');
-    Ember.$(window).unbind('scroll.ember-cloak');
+
+    var scrollSelector = this.get('scrollSelector');
+
+    if (scrollSelector) {
+      Ember.$(scrollSelector).unbind('scroll.ember-cloak');
+      Ember.$(scrollSelector).unbind('touchmove.ember-cloak');
+    } else {
+      Ember.$(document).unbind('touchmove.ember-cloak');
+      Ember.$(window).unbind('scroll.ember-cloak');
+    }
     this.set('scrollingEnabled', false);
   },
 

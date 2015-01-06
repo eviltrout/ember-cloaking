@@ -10,16 +10,21 @@ import Ember from "ember";
 export default Ember.View.extend({
   attributeBindings: ['style'],
 
+  classNameBindings : ['_cloaked:cloaked:uncloaked'],
+
+  _cloaked : true,
   _containedView : null,
   _scheduled : null,
 
   init : function () {
     this._super();
     this._scheduled = false;
+    this._cloaked = true;
     this._childViews = [];
   },
 
   setContainedView : function (cv) {
+
     if (this._childViews[0]) {
       this._childViews[0].destroy();
       this._childViews[0] = cv;
@@ -63,6 +68,8 @@ export default Ember.View.extend({
   uncloak: function() {
     var state = this._state || this.state;
     if (state !== 'inDOM' && state !== 'preRender') { return; }
+
+    this.set('_cloaked', false);
 
     if (!this._containedView) {
       var model = this.get('content'),
@@ -117,6 +124,8 @@ export default Ember.View.extend({
    */
   cloak: function() {
     var self = this;
+
+    this.set('_cloaked', true);
 
     if (this._containedView && (this._state || this.state) === 'inDOM') {
       var style = 'height: ' + this.$().height() + 'px;';
