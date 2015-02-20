@@ -21,7 +21,8 @@ export default Ember.CollectionView.extend({
   init: function() {
     var cloakView = this.get('cloakView'),
       idProperty = this.get('idProperty'),
-      uncloakDefault = !!this.get('uncloakDefault');
+      uncloakDefault = !!this.get('uncloakDefault'),
+      defaultHeight = parseInt(this.get('defaultHeight'), 10);
 
     // Set the slack ratio differently to allow for more or less slack in preloading
     var slackRatio = parseFloat(this.get('slackRatio'));
@@ -32,7 +33,7 @@ export default Ember.CollectionView.extend({
       cloaks: cloakView,
       preservesContext: this.get('preservesContext') === 'true',
       cloaksController: this.get('itemController'),
-      defaultHeight: this.get('defaultHeight'),
+      defaultHeight: defaultHeight,
 
       init: function() {
         this._super();
