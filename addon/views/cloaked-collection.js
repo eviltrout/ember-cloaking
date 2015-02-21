@@ -22,7 +22,13 @@ export default Ember.CollectionView.extend({
     var cloakView = this.get('cloakView'),
       idProperty = this.get('idProperty'),
       uncloakDefault = !!this.get('uncloakDefault'),
-      defaultHeight = parseInt(this.get('defaultHeight'), 10);
+      defaultHeight = parseInt(this.get('defaultHeight'), 10),
+      collectionTagName = (this.get('tagName') || '').toLowerCase(),
+      itemTagName = this.get('itemTagName');
+
+    if (!itemTagName) {
+      itemTagName = (collectionTagName === 'tbody' || collectionTagName === 'table') ? 'tr' : 'div';
+    }
 
     // Set the slack ratio differently to allow for more or less slack in preloading
     var slackRatio = parseFloat(this.get('slackRatio'));
@@ -30,6 +36,7 @@ export default Ember.CollectionView.extend({
 
     this.set('itemViewClass', CloakedView.extend({
       classNames: [cloakView + '-cloak', 'cloak-view'],
+      tagName : itemTagName,
       cloaks: cloakView,
       preservesContext: this.get('preservesContext') === 'true',
       cloaksController: this.get('itemController'),
