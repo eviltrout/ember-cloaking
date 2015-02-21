@@ -253,6 +253,7 @@ export default Ember.CollectionView.extend({
     }
 
     var self = this,
+      id = this.get('elementId'),
       offsetFixedTop = this.get('offsetFixedTop') || this.get('offsetFixed'),
       offsetFixedBottom = this.get('offsetFixedBottom'),
       scrollDebounce = this.get('scrollDebounce'),
@@ -270,11 +271,11 @@ export default Ember.CollectionView.extend({
     }
 
     if (scrollSelector) {
-      Ember.$(scrollSelector).bind('scroll.ember-cloak', onScrollMethod);
-      Ember.$(scrollSelector).bind('touchmove.ember-cloak', onScrollMethod);
+      Ember.$(scrollSelector).bind('scroll.ember-cloak.' + id, onScrollMethod);
+      Ember.$(scrollSelector).bind('touchmove.ember-cloak.' + id, onScrollMethod);
     } else {
-      Ember.$(document).bind('touchmove.ember-cloak', onScrollMethod);
-      Ember.$(window).bind('scroll.ember-cloak', onScrollMethod);
+      Ember.$(document).bind('touchmove.ember-cloak.' + id, onScrollMethod);
+      Ember.$(window).bind('scroll.ember-cloak.' + id, onScrollMethod);
     }
 
     this.addObserver('wrapperTop', self, onScrollMethod);
@@ -288,14 +289,15 @@ export default Ember.CollectionView.extend({
 
   cleanUp: function() {
 
-    var scrollSelector = this.get('scrollSelector');
+    var scrollSelector = this.get('scrollSelector'),
+      id = this.get('elementId');
 
     if (scrollSelector) {
-      Ember.$(scrollSelector).unbind('scroll.ember-cloak');
-      Ember.$(scrollSelector).unbind('touchmove.ember-cloak');
+      Ember.$(scrollSelector).unbind('scroll.ember-cloak.' + id);
+      Ember.$(scrollSelector).unbind('touchmove.ember-cloak.' + id);
     } else {
-      Ember.$(document).unbind('touchmove.ember-cloak');
-      Ember.$(window).unbind('scroll.ember-cloak');
+      Ember.$(document).unbind('touchmove.ember-cloak.' + id);
+      Ember.$(window).unbind('scroll.ember-cloak.' + id);
     }
     this.set('scrollingEnabled', false);
   },
