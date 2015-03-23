@@ -159,9 +159,7 @@ export default Ember.CollectionView.extend({
     while (bottomView < childViews.length) {
       var view = childViews[bottomView],
         $view = view.$(),
-      // in case of not full-window scrolling
-        scrollOffset = this.get('wrapperTop') || 0,
-        viewTop = $view.offset().top + scrollOffset,
+        viewTop = $view.position().top,
         viewBottom = viewTop + $view.height();
 
       if (viewTop > viewportBottom) { break; }
