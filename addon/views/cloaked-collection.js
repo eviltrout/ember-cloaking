@@ -96,13 +96,11 @@ export default Ember.CollectionView.extend({
   findTopView: function(childViews, viewportTop, min, max) {
     if (max < min) { return min; }
 
-    var wrapperTop = this.get('wrapperTop')>>0;
-
     while(max>min){
       var mid = Math.floor((min + max) / 2),
       // in case of not full-window scrolling
         $view = childViews[mid].$(),
-        viewBottom = $view.position().top + wrapperTop + $view.height();
+        viewBottom = $view.position().top + $view.height();
 
       if (viewBottom > viewportTop) {
         max = mid-1;
@@ -159,9 +157,7 @@ export default Ember.CollectionView.extend({
     while (bottomView < childViews.length) {
       var view = childViews[bottomView],
         $view = view.$(),
-      // in case of not full-window scrolling
-        scrollOffset = this.get('wrapperTop') || 0,
-        viewTop = $view.offset().top + scrollOffset,
+        viewTop = $view.position().top,
         viewBottom = viewTop + $view.height();
 
       if (viewTop > viewportBottom) { break; }
