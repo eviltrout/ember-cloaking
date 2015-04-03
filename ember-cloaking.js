@@ -129,7 +129,7 @@
           windowBottom = windowTop + windowHeight,
           viewportBottom = windowBottom + slack,
           topView = this.findTopView(childViews, viewportTop, 0, childViews.length-1),
-          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $('body').height(),
+          bodyHeight = this.get('wrapperHeight') ? this.$().height() : $(document).height(),
           bottomView = topView,
           offsetFixedTopElement = this.get('offsetFixedTopElement'),
           offsetFixedBottomElement = this.get('offsetFixedBottomElement');
