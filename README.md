@@ -9,17 +9,17 @@ Extracted from [Discourse](https://github.com/discourse/discourse)'s infinite sc
 Import Version Notes
 ====================
 
-The latest version has been upgraded to work with Ember 1.8.1. If you need support for older
-versions of Ember, use the '1.7.1' branch.
+The latest version has been upgraded to work with Ember 1.11.3. If you need support for older
+versions of Ember, use the '1.8.1' branch.
 
 Usage
 =====
 
-1. Include `ember-cloaking.js` in your project.
+1. Include `cloaked.js` and `cloaked-collection.js` in your Ember project's `views` directory.
 2. To display a collection of cloaked items, use `{{cloaked-collection}}` in your handlebars templates like this:
 
 ```handlebars
-  {{cloaked-collection itemViewClass="post" content=postStream.posts}}
+  {{cloaked-collection itemViewClass="post" content=model.posts}}
 ```
 
 `itemViewClass` is the name of the view to render in the collection. `post` would render `PostView`.
@@ -35,7 +35,7 @@ Name of the controller for items in collection.
 
 
 ####defaultHeight
-Default: `100` 
+Default: `100`
 
 Height of the cloaked views by default. You should pick a value that is in the ballpark of
 your average view height.
