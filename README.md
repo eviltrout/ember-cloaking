@@ -26,70 +26,70 @@ Usage
 
 `content` is the collection of items to display.
 
-###Optional parameters
+### Optional parameters
 
-####itemController
+#### itemController
 Default: `undefined` (not controller will be used)
 
 Name of the controller for items in collection.
 
 
-####defaultHeight
+#### defaultHeight
 Default: `100`
 
 Height of the cloaked views by default. You should pick a value that is in the ballpark of
 your average view height.
 
 
-####loadingHTML
+#### loadingHTML
 Default: `"Loading..."`
 
 HTML you want to render while the cloaking is loading.
 
 
-####preservesContext
+#### preservesContext
 Default: `false`
 
 Set to "true" if you want to use `content.xyz` in your views instead of the `context`.
 
 
-####idProperty
+#### idProperty
 Default: `undefined`
 
 Name of item's property to generate cloaked view DOM id. If set `id` will be generated using `itemViewClass` like so: `{{itemViewClass}}-cloak-{{item.idProperty}}`. Check out [demo](/demos/iscroll.html)
 
 
-####offsetFixedTop
+#### offsetFixedTop
 Default: `undefined`
 
 jQuery selector that will be used to offset the top of what is considered onscreen. Discourse uses this for example because we have a `position: fixed; top: 0` header that is on top of content.
 
-####offsetFixedBottom
+#### offsetFixedBottom
 Default: `undefined`
 
 jQuery selector that will be used to offset the bottom of what is considered onscreen. Discourse uses this for example because we have a `position: fixed; bottom: 0` composer that is on top of content.
 
 
-####wrapperTop
+#### wrapperTop
 Default: `undefined`
 
 Current scroll position like native [element.scrollTop](https://developer.mozilla.org/en-US/docs/Web/API/Element.scrollTop) (see [iScroll support](#iscroll-or-other-scrollers)).
 
 
-####wrapperHeight
+#### wrapperHeight
 Default: `undefined`
 
 Height of the "window" in which content is scrolling (see [iScroll support](#iscroll-or-other-scrollers)).
 
 
-###uncloakDefault
+### uncloakDefault
 Default: `false`
 
 Whether or not to uncloak views by default when created. This is useful for sites like Discourse
 that perform infinite scrolling upwards, and depend on inserting elements above the top fold.
 
 
-###scrollDebounce
+### scrollDebounce
 Default: 10
 
 The amount of debouncing in ms that will be considered for cloaking. You probably don't have to change
